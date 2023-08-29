@@ -27,6 +27,7 @@ The stack that I use are klippy, moonraker, mainsail, nginx
 
 
 ## Moonraker configuration
+The klipper configuration files are moved to the moonraker configuration directory for convenience. I can find them in /var/opt/moonraker. Moonraker runs as its own user, so does klipper.
 > /etc/systemd/system/multi-user.target.wants/moonraker.service
 
     [Unit]
