@@ -7,6 +7,7 @@ The stack that I use are klippy, moonraker, mainsail, nginx
 
 ## Klippy configuration
 /etc/systemd/system/multi-user.target.wants/klipper.service:
+
 `
 [Unit]
 Description=3D printer firmware with motion planning on the host
