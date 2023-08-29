@@ -8,119 +8,118 @@ The stack that I use are klippy, moonraker, mainsail, nginx
 ## Klippy configuration
 
 > /etc/systemd/system/multi-user.target.wants/klipper.service
-`
-[Unit]
-Description=3D printer firmware with motion planning on the host
-After=network.target
 
-[Install]
-WantedBy=multi-user.target
+    [Unit]
+    Description=3D printer firmware with motion planning on the host
+    After=network.target
+    
+    [Install]
+    WantedBy=multi-user.target
+    
+    [Service]
+    Type=simple
+    User=klipper
+    RemainAfterExit=no
+    Environment=PYTHONUNBUFFERED=1
+    ExecStart=/usr/bin/python /usr/lib/klipper-github/klippy/klippy.py /var/opt/moonraker/config/klipper.cfg -I /run/klipper/sock -a /var/opt/moonraker/comms/moonraker.sock -l /var/opt/moonraker/logs/klippy.log -a /tmp/klipper_uds
+    Restart=always
+    RestartSec=10
 
-[Service]
-Type=simple
-User=klipper
-RemainAfterExit=no
-Environment=PYTHONUNBUFFERED=1
-ExecStart=/usr/bin/python /usr/lib/klipper-github/klippy/klippy.py /var/opt/moonraker/config/klipper.cfg -I /run/klipper/sock -a /var/opt/moonraker/comms/moonraker.sock -l /var/opt/moonraker/logs/klippy.log -a /tmp/klipper_uds
-Restart=always
-RestartSec=10
-`
 
 ## Moonraker configuration
 > /etc/systemd/system/multi-user.target.wants/moonraker.service
 
-`[Unit]
-Description=Moonraker Klipper HTTP Server
-Requires=klipper.service
-After=network.target klipper.service
-
-[Service]
-Type=simple
-User=klipper
-#WorkingDirectory=/var/lib/klipper
-WorkingDirectory=/var/opt/moonraker
-SupplementaryGroups=moonraker-admin
-SyslogIdentifier=moonraker
-RemainAfterExit=yes
-EnvironmentFile=/var/opt/moonraker/systemd/moonraker.env
-ExecStart=/var/lib/klipper/.local/pipx/venvs/moonraker/bin/python -m moonraker $MOONRAKER_ARGS
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target`
+    [Unit]
+    Description=Moonraker Klipper HTTP Server
+    Requires=klipper.service
+    After=network.target klipper.service
+    
+    [Service]
+    Type=simple
+    User=klipper
+    WorkingDirectory=/var/opt/moonraker
+    SupplementaryGroups=moonraker-admin
+    SyslogIdentifier=moonraker
+    RemainAfterExit=yes
+    EnvironmentFile=/var/opt/moonraker/systemd/moonraker.env
+    ExecStart=/var/lib/klipper/.local/pipx/venvs/moonraker/bin/python -m moonraker $MOONRAKER_ARGS
+    Restart=always
+    RestartSec=10
+    
+    [Install]
+    WantedBy=multi-user.target
 
 
 > /var/opt/moonraker/systemd/moonraker.env
 
-`MOONRAKER_ARGS="-v -g -d /var/opt/moonraker -c /var/opt/moonraker/config/moonraker.conf -l /var/opt/moonraker/logs/moonraker.log"`
+    MOONRAKER_ARGS="-v -g -d /var/opt/moonraker -c /var/opt/moonraker/config/moonraker.conf -l /var/opt/moonraker/logs/moonraker.log"
 
 ## nginx configuration 
-/etc/nginx/sites-enabled/mainsail:
-`
 
-server {
-    listen 80 default_server;
+> /etc/nginx/sites-enabled/mainsail
 
-    access_log /var/log/nginx/mainsail-access.log;
-    error_log /var/log/nginx/mainsail-error.log;
+    server {
+        listen 80 default_server;
+    
+        access_log /var/log/nginx/mainsail-access.log;
+        error_log /var/log/nginx/mainsail-error.log;
+    
+        gzip on;
+        gzip_vary on;
+        gzip_proxied any;
+        gzip_proxied expired no-cache no-store private auth;
+        gzip_comp_level 4;
+        gzip_buffers 16 8k;
+        gzip_http_version 1.1;
+        gzip_types text/plain text/css text/xml text/javascript application/javascript application/x-javascript application/json application/xml;
+    
+        # web_path from mainsail static files
+        root /usr/share/webapps/mainsail;
+    
+        index index.html;
+        server_name _;
+    
+        client_max_body_size 0;
+    
+        proxy_request_buffering off;
+    
+        location / {
+            try_files $uri $uri/ /index.html;
+        }
+    
+        location = /index.html {
+            add_header Cache-Control "no-store, no-cache, must-revalidate";
+        }
+    
+        location /websocket {
+            proxy_pass http://apiserver/websocket;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $connection_upgrade;
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_read_timeout 86400;
+        }
+    
+        location ~ ^/(printer|api|access|machine|server)/ {
+            proxy_pass http://apiserver$request_uri;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Scheme $scheme;
+        }
+    
+    }
+    include /etc/nginx/conf.d/upstream.cfg;
 
-    gzip on;
-    gzip_vary on;
-    gzip_proxied any;
-    gzip_proxied expired no-cache no-store private auth;
-    gzip_comp_level 4;
-    gzip_buffers 16 8k;
-    gzip_http_version 1.1;
-    gzip_types text/plain text/css text/xml text/javascript application/javascript application/x-javascript application/json application/xml;
+> /etc/nginx/conf.d/upstreams.conf
 
-    # web_path from mainsail static files
-    root /usr/share/webapps/mainsail;
-
-    index index.html;
-    server_name _;
-
-    client_max_body_size 0;
-
-    proxy_request_buffering off;
-
-    location / {
-        try_files $uri $uri/ /index.html;
+    upstream apiserver {
+        ip_hash;
+        server 127.0.0.1:7125;
     }
 
-    location = /index.html {
-        add_header Cache-Control "no-store, no-cache, must-revalidate";
-    }
 
-    location /websocket {
-        proxy_pass http://apiserver/websocket;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection $connection_upgrade;
-        proxy_set_header Host $http_host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_read_timeout 86400;
-    }
-
-    location ~ ^/(printer|api|access|machine|server)/ {
-        proxy_pass http://apiserver$request_uri;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Host $http_host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Scheme $scheme;
-    }
-
-}
-include /etc/nginx/conf.d/upstream.cfg;
-`
-
-/etc/nginx/conf.d/upstreams.conf:
-`
-upstream apiserver {
-    ip_hash;
-    server 127.0.0.1:7125;
-}
-`
