@@ -6,8 +6,8 @@ I run this on an old medion nuc device using arch linux and have compiled everyt
 The stack that I use are klippy, moonraker, mainsail, nginx
 
 ## Klippy configuration
-/etc/systemd/system/multi-user.target.wants/klipper.service:
 
+> /etc/systemd/system/multi-user.target.wants/klipper.service
 `
 [Unit]
 Description=3D printer firmware with motion planning on the host
@@ -25,10 +25,11 @@ ExecStart=/usr/bin/python /usr/lib/klipper-github/klippy/klippy.py /var/opt/moon
 Restart=always
 RestartSec=10
 `
+
 ## Moonraker configuration
-/etc/systemd/system/multi-user.target.wants/moonraker.service:
-`
-[Unit]
+> /etc/systemd/system/multi-user.target.wants/moonraker.service
+
+`[Unit]
 Description=Moonraker Klipper HTTP Server
 Requires=klipper.service
 After=network.target klipper.service
@@ -47,13 +48,12 @@ Restart=always
 RestartSec=10
 
 [Install]
-WantedBy=multi-user.target
-`
+WantedBy=multi-user.target`
 
-/var/opt/moonraker/systemd/moonraker.env:
-`
-MOONRAKER_ARGS="-v -g -d /var/opt/moonraker -c /var/opt/moonraker/config/moonraker.conf -l /var/opt/moonraker/logs/moonraker.log"
-`
+
+> /var/opt/moonraker/systemd/moonraker.env
+
+`MOONRAKER_ARGS="-v -g -d /var/opt/moonraker -c /var/opt/moonraker/config/moonraker.conf -l /var/opt/moonraker/logs/moonraker.log"`
 
 ## nginx configuration 
 /etc/nginx/sites-enabled/mainsail:
