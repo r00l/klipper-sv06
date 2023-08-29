@@ -6,6 +6,7 @@ I run this on an old medion nuc device using arch linux and have compiled everyt
 The stack that I use are klippy, moonraker, mainsail, nginx
 
 ## Klippy configuration
+The klipper repository has been cloned to /usr/lib/klipper-github, this is where I must go to pull new updates and rebuild the firmware. Below is the systemd service file that starts klippy when i turn on the nuc.
 
 > /etc/systemd/system/multi-user.target.wants/klipper.service
 
