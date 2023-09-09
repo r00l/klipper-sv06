@@ -5,6 +5,8 @@ I run this on an old medion nuc device using arch linux and have compiled everyt
 
 The stack that I use are klippy, moonraker, mainsail, nginx
 
+Klipper is compiled for my SV06 according to the documentation, using commit 5f990f9 published about 3 weeks ago
+
 ## Klippy configuration
 The klipper repository has been cloned to /usr/lib/klipper-github, this is where I must go to pull new updates and rebuild the firmware. Below is the systemd service file that starts klippy when i turn on the nuc.
 
