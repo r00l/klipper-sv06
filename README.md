@@ -117,15 +117,10 @@ The klipper configuration files are moved to the moonraker configuration directo
         }
     
     }
-    include /etc/nginx/conf.d/upstream.cfg;
-
-> /etc/nginx/conf.d/upstreams.conf
-
     upstream apiserver {
         ip_hash;
         server 127.0.0.1:7125;
     }
-
 
 ## other interesting urls for later
 https://github.com/rootiest
