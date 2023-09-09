@@ -127,3 +127,4 @@ The klipper configuration files are moved to the moonraker configuration directo
 
 ## other interesting urls for later
 https://github.com/rootiest
+https://ellis3dp.com/Print-Tuning-Guide/
