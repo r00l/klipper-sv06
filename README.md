@@ -124,4 +124,6 @@ The klipper configuration files are moved to the moonraker configuration directo
 
 ## other interesting urls for later
 https://github.com/rootiest 
-https://ellis3dp.com/Print-Tuning-Guide/
+https://ellis3dp.com/Print-Tuning-Guide/  
+https://www.advanced3dprinting.com/flow-rate-calculator/  
+https://www.th3dstudio.com/klipper-abl-mesh-homing-calculator/
