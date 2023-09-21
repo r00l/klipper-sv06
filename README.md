@@ -129,4 +129,5 @@ https://www.advanced3dprinting.com/flow-rate-calculator/
 https://www.th3dstudio.com/klipper-abl-mesh-homing-calculator/  
 https://teachingtechyt.github.io/calibration.html#esteps  
 https://belt.connect.prusa3d.com/  
-https://bitfab.io/blog/meshmixer/
+https://bitfab.io/blog/meshmixer/  
+https://coloringchaos.github.io/form-fall-16/joints
