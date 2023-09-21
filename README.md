@@ -128,4 +128,5 @@ https://ellis3dp.com/Print-Tuning-Guide/
 https://www.advanced3dprinting.com/flow-rate-calculator/  
 https://www.th3dstudio.com/klipper-abl-mesh-homing-calculator/  
 https://teachingtechyt.github.io/calibration.html#esteps  
-https://belt.connect.prusa3d.com/
+https://belt.connect.prusa3d.com/  
+https://bitfab.io/blog/meshmixer/
